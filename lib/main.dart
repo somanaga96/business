@@ -9,8 +9,6 @@ void main() async {
   runApp(const Home());
 }
 
-
-
 class Home extends StatelessWidget {
   const Home({super.key});
 
@@ -21,7 +19,6 @@ class Home extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: const LoginPage(),
       home: const HomePage(),
     );
   }

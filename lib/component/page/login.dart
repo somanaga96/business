@@ -1,3 +1,4 @@
+import 'package:business/component/page/business_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
             // Example: Navigate to another page
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),
+              MaterialPageRoute(builder: (context) => const BusinessHome()),
             );
           } else {
             _showError('Invalid username or password');
@@ -75,7 +76,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(border: OutlineInputBorder(),labelText: 'Password'),
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(), labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -96,5 +98,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-
