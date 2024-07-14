@@ -1,12 +1,17 @@
+import 'package:business/component/firebase/firebase_options.dart';
+import 'package:business/component/utils/global.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'component/page/home.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const Home());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(ChangeNotifierProvider(
+    create: (context) => Global(),
+    child: const Home(),
+  ));
 }
 
 class Home extends StatelessWidget {
@@ -23,29 +28,3 @@ class Home extends StatelessWidget {
     );
   }
 }
-//
-// class FirestoreExample extends StatelessWidget {
-//   const FirestoreExample({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return StreamBuilder(
-//       stream: FirebaseFirestore.instance.collection('loans').snapshots(),
-//       builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-//         if (!snapshot.hasData) {
-//           return const CircularProgressIndicator();
-//         }
-//         var documents = snapshot.data!.docs;
-//         return ListView.builder(
-//           itemCount: documents.length,
-//           itemBuilder: (context, index) {
-//             return ListTile(
-//               title: Text(documents[index]['name']),
-//               subtitle: Text(documents[index]['amount'].toString()),
-//             );
-//           },
-//         );
-//       },
-//     );
-//   }
-// }

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class BusinessHome extends StatefulWidget {
   const BusinessHome({super.key});
@@ -10,6 +10,8 @@ class BusinessHome extends StatefulWidget {
 class _BusinessHomeState extends State<BusinessHome> {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Business Home"));
+    return Scaffold(
+        appBar: AppBar(title: const Text('Home')),
+        body: const Center(child: Text("Business Home")));
   }
 }
