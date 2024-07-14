@@ -11,7 +11,7 @@ class _BusinessHomeState extends State<BusinessHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Home')),
+        appBar: AppBar(title: const Text('Home'),backgroundColor: Colors.lightBlue,),
         body: const Center(child: Text("Business Home")));
   }
 }
