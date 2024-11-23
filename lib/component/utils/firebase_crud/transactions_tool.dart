@@ -261,6 +261,10 @@ class TransactionsTool extends ChangeNotifier {
                             dateTime = DateTime.now();
                             Provider.of<Global>(context, listen: false)
                                 .getTransactionsDetails();
+                            Provider.of<Global>(context, listen: false)
+                                .getDebitTransactions();
+                            Provider.of<Global>(context, listen: false)
+                                .getCreditTransactions();
                           }
                         },
                         child: const Text(
@@ -407,6 +411,10 @@ class TransactionsTool extends ChangeNotifier {
                             Navigator.pop(ctx);
                             Provider.of<Global>(context, listen: false)
                                 .getTransactionsDetails();
+                            Provider.of<Global>(context, listen: false)
+                                .getDebitTransactions();
+                            Provider.of<Global>(context, listen: false)
+                                .getCreditTransactions();
                           }
                         },
                         child: const Text(
