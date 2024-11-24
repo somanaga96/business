@@ -151,9 +151,20 @@ class TransactionsTool extends ChangeNotifier {
   FirebaseFirestore db = FirebaseFirestore.instance;
   List<String> list = <String>[
     'தேர்ந்தெடுக்கவும்',
-    'அப்பளம்',
-    'பிளாஸ்டிக்',
+    'முட்டை',
+    'எண்ணெய்',
     'பேக்கரி',
+    'மைதா',
+    'கலர்',
+    'சீனி',
+    'புளி',
+    'வெல்லம்',
+    'பிளாஸ்டிக்',
+    'அப்பளம்',
+    'விறகு',
+    'டீசல்',
+    'driver சம்பளம்',
+    'பூடா பேக்கிங்',
   ];
   final List _tenureTypes = ["வரவு", "செலவு"];
   String _tenureType = "வரவு";
@@ -259,6 +270,8 @@ class TransactionsTool extends ChangeNotifier {
                             nameController.text = '';
                             amountController.text = '';
                             dateTime = DateTime.now();
+                            onPressed:
+                            Navigator.pop(ctx);
                             Provider.of<Global>(context, listen: false)
                                 .getTransactionsDetails();
                             Provider.of<Global>(context, listen: false)
@@ -287,6 +300,8 @@ class TransactionsTool extends ChangeNotifier {
     try {
       await transactions.doc(docId).delete();
       Provider.of<Global>(context, listen: false).getTransactionsDetails();
+      Provider.of<Global>(context, listen: false).getDebitTransactions();
+      Provider.of<Global>(context, listen: false).getCreditTransactions();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Transaction deleted successfully!')),
       );
