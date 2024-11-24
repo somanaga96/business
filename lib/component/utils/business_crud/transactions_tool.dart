@@ -1,5 +1,5 @@
 import 'package:business/component/entity/transaction.dart';
-import 'package:business/component/utils/firebase_crud/purchase_income_input.dart';
+import 'package:business/component/utils/business_crud/purchase_income_input.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -88,23 +88,7 @@ class TransactionsTool extends ChangeNotifier {
     return totalPrice.toString();
   }
 
-  Future<List<Transactions>> fetchAllPurchaseFromDB() async {
-    List<Transactions> objectList = [];
-    try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot =
-          await FirebaseFirestore.instance.collection('transanction').get();
 
-      for (var doc in querySnapshot.docs) {
-        // Use the factory constructor to ensure proper conversion
-        Transactions yourObject = Transactions.fromMap(doc.id, doc.data());
-        objectList.add(yourObject);
-      }
-    } catch (e) {
-      debugPrint("Error fetching purchases: $e");
-    }
-    notifyListeners();
-    return objectList;
-  }
 
   Future<List<Transactions>> fetchCurrentMonthPurchaseFromDB(
       DateTime date) async {
@@ -151,6 +135,7 @@ class TransactionsTool extends ChangeNotifier {
   FirebaseFirestore db = FirebaseFirestore.instance;
   List<String> list = <String>[
     'தேர்ந்தெடுக்கவும்',
+    'வியாபாரம்',
     'முட்டை',
     'எண்ணெய்',
     'பேக்கரி',
@@ -165,6 +150,7 @@ class TransactionsTool extends ChangeNotifier {
     'டீசல்',
     'driver சம்பளம்',
     'பூடா பேக்கிங்',
+    'மசாலா'
   ];
   final List _tenureTypes = ["வரவு", "செலவு"];
   String _tenureType = "வரவு";
@@ -172,6 +158,7 @@ class TransactionsTool extends ChangeNotifier {
 
   Future<void> createTransaction(BuildContext context) async {
     String dropdownValue = list.first;
+
     await showModalBottomSheet<void>(
       isScrollControlled: true,
       context: context,
@@ -258,27 +245,56 @@ class TransactionsTool extends ChangeNotifier {
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          final int? num = int.tryParse(amountController.text);
-                          if (num != null) {
-                            await transactions.add({
-                              'name': dropdownValue,
-                              'price': num,
-                              'date': dateTime,
-                              'credit': _tenureType == _tenureTypes[0],
-                              // "வரவு" -> true, "செலவு" -> false
-                            });
-                            nameController.text = '';
-                            amountController.text = '';
-                            dateTime = DateTime.now();
-                            onPressed:
-                            Navigator.pop(ctx);
-                            Provider.of<Global>(context, listen: false)
-                                .getTransactionsDetails();
-                            Provider.of<Global>(context, listen: false)
-                                .getDebitTransactions();
-                            Provider.of<Global>(context, listen: false)
-                                .getCreditTransactions();
+                          // Validation logic for empty or invalid values
+                          if (amountController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Amount cannot be empty!'),
+                              ),
+                            );
+                            return;
                           }
+
+                          final int? num = int.tryParse(amountController.text);
+                          if (num == null || num <= 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter a valid amount!'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (dropdownValue.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select a valid item!'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          await transactions.add({
+                            'name': dropdownValue,
+                            'price': num,
+                            'date': dateTime,
+                            'credit': _tenureType == _tenureTypes[0],
+                            // "வரவு" -> true, "செலவு" -> false
+                          });
+
+                          // Reset fields and close modal
+                          nameController.text = '';
+                          amountController.text = '';
+                          dateTime = DateTime.now();
+                          Navigator.pop(ctx);
+
+                          // Refresh data
+                          Provider.of<Global>(context, listen: false)
+                              .getTransactionsDetails();
+                          Provider.of<Global>(context, listen: false)
+                              .getDebitTransactions();
+                          Provider.of<Global>(context, listen: false)
+                              .getCreditTransactions();
                         },
                         child: const Text(
                           "Add",

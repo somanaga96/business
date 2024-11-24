@@ -1,4 +1,4 @@
-import 'package:business/component/page/business_home.dart';
+import 'package:business/component/page/business/business_home.dart';
 import 'package:business/component/utils/global.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

@@ -3,7 +3,8 @@ import 'package:business/component/utils/global.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'component/page/business_home.dart';
+import 'component/bottom_navigation.dart';
+import 'component/page/business/business_home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,7 @@ class Home extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: const HomePage(),
-      home: const BusinessHome(),
+      home: const BottomNavigation(),
     );
   }
 }

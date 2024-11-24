@@ -1,9 +1,11 @@
-import 'package:business/component/utils/firebase_crud/transactions_tool.dart';
-import 'package:business/component/utils/firebase_crud/user_tool.dart';
+import 'package:business/component/entity/expense.dart';
+import 'package:business/component/utils/expense_crud/expense_tool.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../entity/user.dart';
 import '../entity/transaction.dart';
+import 'business_crud/transactions_tool.dart';
+import 'business_crud/user_tool.dart';
 
 class Global extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
@@ -13,6 +15,8 @@ class Global extends ChangeNotifier {
     notifyListeners();
     getCreditTransactions();
     getDebitTransactions();
+    getCurrentMonthExpenseTransaction();
+    getCurrentMonthExpenseTotal();
   }
 
   DateTime get selectedDate => _selectedDate;
@@ -84,6 +88,40 @@ class Global extends ChangeNotifier {
       _purchaseDebitList =
           await transactionsTool.fetchAllMonthDebitFromDB(_selectedDate);
 
+      notifyListeners();
+    } catch (error) {
+      print('Error fetching users: $error');
+    }
+  }
+
+  //purchase details
+  List<Expense> expenseList = [];
+
+  void getCurrentMonthExpenseTransaction() async {
+    expenseList.clear();
+    try {
+      ExpenseTool expenseTool = ExpenseTool();
+      List<Expense> expenses =
+          await expenseTool.fetchCurrentMonthExpenseFromDB(_selectedDate);
+      expenseList.addAll(expenses);
+      notifyListeners();
+    } catch (error) {
+      print('Error fetching users: $error');
+    }
+  }
+
+  String _expenseTotal = "";
+
+  String get expenseTotal => _expenseTotal;
+
+  set expenseTotal(String value) {
+    _expenseTotal = value;
+  }
+
+  void getCurrentMonthExpenseTotal() async {
+    try {
+      ExpenseTool expenseTool = ExpenseTool();
+      _expenseTotal = await expenseTool.fetchCurrentMonthSum(_selectedDate);
       notifyListeners();
     } catch (error) {
       print('Error fetching users: $error');
