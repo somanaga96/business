@@ -35,12 +35,11 @@ class _BusinessHomeState extends State<BusinessHome> {
             const Center(child: Text('Business Home')),
             ElevatedButton(
               onPressed: () {
-                // Logout logic and navigation
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const HomePage(),
-                  ), // Replace with your login page
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
