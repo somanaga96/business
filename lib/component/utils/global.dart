@@ -16,7 +16,8 @@ class Global extends ChangeNotifier {
     getCreditTransactions();
     getDebitTransactions();
     getCurrentMonthExpenseTransaction();
-    getCurrentMonthExpenseTotal();
+    getCurrentMonthExpenseGivenTotal();
+    getCurrentMonthExpenseBoughtTotal();
   }
 
   DateTime get selectedDate => _selectedDate;
@@ -110,18 +111,38 @@ class Global extends ChangeNotifier {
     }
   }
 
-  String _expenseTotal = "";
+  String _expenseGivenTotal = "";
 
-  String get expenseTotal => _expenseTotal;
+  String get expenseGivenTotal => _expenseGivenTotal;
 
   set expenseTotal(String value) {
-    _expenseTotal = value;
+    _expenseGivenTotal = value;
   }
 
-  void getCurrentMonthExpenseTotal() async {
+  void getCurrentMonthExpenseGivenTotal() async {
     try {
       ExpenseTool expenseTool = ExpenseTool();
-      _expenseTotal = await expenseTool.fetchCurrentMonthSum(_selectedDate);
+      _expenseGivenTotal =
+          await expenseTool.fetchCurrentMonthGivenSum(_selectedDate);
+      notifyListeners();
+    } catch (error) {
+      print('Error fetching users: $error');
+    }
+  }
+
+  String _expenseBoughtTotal = "";
+
+  String get expenseBoughtTotal => _expenseBoughtTotal;
+
+  set expenseBoughtTotal(String value) {
+    _expenseBoughtTotal = value;
+  }
+
+  void getCurrentMonthExpenseBoughtTotal() async {
+    try {
+      ExpenseTool expenseTool = ExpenseTool();
+      _expenseBoughtTotal =
+          await expenseTool.fetchCurrentMonthBoughtSum(_selectedDate);
       notifyListeners();
     } catch (error) {
       print('Error fetching users: $error');

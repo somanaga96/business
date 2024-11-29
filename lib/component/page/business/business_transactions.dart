@@ -80,10 +80,10 @@ class TransactionItem extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     // Container height is based on screen height to make it responsive
-    double containerHeight = screenHeight / 18;
+    double containerHeight = screenHeight * 0.08;
 
     // Horizontal and vertical padding, based on screen width and height
-    double horizontalPadding = screenWidth * 0.03;
+    double horizontalPadding = screenWidth * 0.05;
     double verticalPadding = screenHeight * 0.01;
 
     // Adjusted positioning ratios for centering and spacing
@@ -127,7 +127,7 @@ class TransactionItem extends StatelessWidget {
               top: containerHeight / 2 - 15, // Adjusted vertically center
               left: priceLeftPosition, // Horizontally centered
               child: SizedBox(
-                width: 100,
+                height: screenHeight * 0.02,
                 child: Center(
                   child: Text(
                     '${transaction.price}',

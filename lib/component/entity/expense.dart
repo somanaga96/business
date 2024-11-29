@@ -5,12 +5,14 @@ class Expense {
   int amount;
   DateTime date;
   String name;
+  bool credit;
 
   Expense(
       {required this.id,
       required this.amount,
       required this.date,
-      required this.name});
+      required this.name,
+      required this.credit});
 
   factory Expense.fromMap(String id, Map<String, dynamic> map) {
     DateTime dateTime = map['date'] is Timestamp
@@ -18,11 +20,11 @@ class Expense {
         : map['date'];
 
     return Expense(
-      id: id,
-      amount: map['amount'],
-      date: dateTime,
-      name: map['name'],
-    );
+        id: id,
+        amount: map['amount'],
+        date: dateTime,
+        name: map['name'],
+        credit: map['credit']);
   }
 
   // Ensure you provide a method to convert this model to a map for Firestore.
@@ -31,6 +33,7 @@ class Expense {
       'amount': amount,
       'date': Timestamp.fromDate(date), // Convert DateTime to Timestamp here
       'name': name,
+      'credit': credit
     };
   }
 }

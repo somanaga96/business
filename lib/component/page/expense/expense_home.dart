@@ -21,7 +21,10 @@ class _ExpenseHomeState extends State<ExpenseHome> {
     super.initState();
     Provider.of<Global>(context, listen: false)
         .getCurrentMonthExpenseTransaction();
-    Provider.of<Global>(context, listen: false).getCurrentMonthExpenseTotal();
+    Provider.of<Global>(context, listen: false)
+        .getCurrentMonthExpenseGivenTotal();
+    Provider.of<Global>(context, listen: false)
+        .getCurrentMonthExpenseBoughtTotal();
   }
 
   @override
