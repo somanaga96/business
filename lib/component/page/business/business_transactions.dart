@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../utils/business_crud/transactions_tool.dart';
 import '../../utils/global.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class BusinessTransactions extends StatefulWidget {
   const BusinessTransactions({super.key});
@@ -25,6 +26,13 @@ class _BusinessTransactionsState extends State<BusinessTransactions> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  void refreshTransactions() {
+    setState(() {
+      isLoading = true;
+    });
+    fetchData(); // Refresh the data
   }
 
   @override
@@ -49,11 +57,13 @@ class _BusinessTransactionsState extends State<BusinessTransactions> {
               final transaction = global.purchaseList[index];
               final DateFormat formatter = DateFormat('d-MMM-yy');
               final String dateAndMonth = formatter.format(transaction.date);
+              final bool credit = transaction.credit;
 
               return TransactionItem(
                 transaction: transaction,
                 dateAndMonth: dateAndMonth,
                 transactionsTool: transactionsTool,
+                creditName: credit, // Pass callback
               );
             },
           ),
@@ -63,144 +73,111 @@ class _BusinessTransactionsState extends State<BusinessTransactions> {
   }
 }
 
-class TransactionItem extends StatelessWidget {
+class TransactionItem extends StatefulWidget {
   final transaction;
   final String dateAndMonth;
   final TransactionsTool transactionsTool;
+  final bool creditName;
 
-  const TransactionItem({
-    required this.transaction,
-    required this.dateAndMonth,
-    required this.transactionsTool,
-  });
+  const TransactionItem(
+      {super.key,
+      required this.transaction,
+      required this.dateAndMonth,
+      required this.transactionsTool,
+      required this.creditName});
 
   @override
+  _TransactionItemState createState() => _TransactionItemState();
+}
+
+class _TransactionItemState extends State<TransactionItem> {
+  @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
+    return Slidable(
+      key: Key(widget.transaction.id),
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) async {
+              if (!mounted) return; // Ensure widget is still mounted
+              await widget.transactionsTool.updateTransaction(
+                mounted,
+                context,
+                widget.transaction.id,
+                {
+                  'name': widget.transaction.name,
+                  'price': widget.transaction.price,
+                  'credit': widget.transaction.credit,
+                  'date': widget.transaction.date,
+                },
+              ); // Refresh after update
+            },
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+            label: 'Edit',
+          ),
+          SlidableAction(
+            onPressed: (context) async {
+              if (!mounted) return; // Ensure widget is still mounted
+              bool? confirmDelete = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Confirm Delete'),
+                    content: const Text(
+                        'Are you sure you want to delete this transaction?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Delete'),
+                      ),
+                    ],
+                  );
+                },
+              );
 
-    // Container height is based on screen height to make it responsive
-    double containerHeight = screenHeight * 0.08;
-
-    // Horizontal and vertical padding, based on screen width and height
-    double horizontalPadding = screenWidth * 0.05;
-    double verticalPadding = screenHeight * 0.01;
-
-    // Adjusted positioning ratios for centering and spacing
-    double leftPosition = screenWidth * 0.05;
-    double topPosition = containerHeight * 0.2;
-    double priceLeftPosition = (screenWidth / 2) - 50;
-
-    return Container(
-      margin: EdgeInsets.symmetric(
-          horizontal: horizontalPadding, vertical: verticalPadding),
-      decoration: BoxDecoration(
-        border: Border.all(),
-        borderRadius: BorderRadius.circular(15.0),
+              if (confirmDelete == true) {
+                if (!mounted) return; // Ensure widget is still mounted
+                await widget.transactionsTool
+                    .deleteTransaction(mounted, context, widget.transaction.id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text('${widget.transaction.name} deleted.')),
+                );
+              }
+            },
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: 'Delete',
+          ),
+        ],
       ),
-      child: SizedBox(
-        width: double.infinity,
-        height: containerHeight,
-        child: Stack(
-          children: [
-            Positioned(
-              left: leftPosition,
-              top: topPosition,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    transaction.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: transaction.credit ? Colors.green : Colors.red,
-                    ),
-                  ),
-                  Text(
-                    dateAndMonth,
-                    style: const TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: containerHeight / 2 - 15, // Adjusted vertically center
-              left: priceLeftPosition, // Horizontally centered
-              child: SizedBox(
-                height: screenHeight * 0.02,
-                child: Center(
-                  child: Text(
-                    '${transaction.price}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: transaction.credit ? Colors.green : Colors.red,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: horizontalPadding,
-              top: verticalPadding,
-              bottom: verticalPadding,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.blue),
-                    onPressed: () {
-                      transactionsTool.updateTransaction(
-                        context,
-                        transaction.id,
-                        {
-                          'name': transaction.name,
-                          'price': transaction.price,
-                          'credit': transaction.credit,
-                          'date': transaction.date,
-                        },
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () async {
-                      bool? confirmDelete = await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Confirm Delete'),
-                            content: const Text(
-                                'Are you sure you want to delete this transaction?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(false); // User canceled
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(true); // User confirmed
-                                },
-                                child: const Text('Delete'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (confirmDelete == true) {
-                        await transactionsTool.deleteTransaction(
-                            context, transaction.id);
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: ListTile(
+          title: Text(
+            widget.transaction.name,
+            style:
+                TextStyle(color: widget.creditName ? Colors.green : Colors.red),
+          ),
+          subtitle: Text(widget.dateAndMonth),
+          trailing: Text(
+            widget.transaction.price.toString(),
+            style: TextStyle(
+                fontSize: 18.0,
+                color: widget.creditName ? Colors.green : Colors.red),
+          ),
         ),
       ),
     );

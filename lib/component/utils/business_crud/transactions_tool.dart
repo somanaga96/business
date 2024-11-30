@@ -17,7 +17,9 @@ class TransactionsTool extends ChangeNotifier {
       DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
 
       // Get the last day of the month
-      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 0);
+      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 23, minutes: 59, seconds: 59));
 
       // Fetch the data within the current month range
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -56,7 +58,9 @@ class TransactionsTool extends ChangeNotifier {
       DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
 
       // Get the last day of the month
-      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 0);
+      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 23, minutes: 59, seconds: 59));
 
       // Fetch the data within the current month range
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -88,8 +92,6 @@ class TransactionsTool extends ChangeNotifier {
     return totalPrice.toString();
   }
 
-
-
   Future<List<Transactions>> fetchCurrentMonthPurchaseFromDB(
       DateTime date) async {
     List<Transactions> objectList = [];
@@ -99,7 +101,9 @@ class TransactionsTool extends ChangeNotifier {
       DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
 
       // Get the last day of the month
-      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 0);
+      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 23, minutes: 59, seconds: 59));
 
       // Fetch the data within the current month range
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -256,7 +260,7 @@ class TransactionsTool extends ChangeNotifier {
                           }
 
                           final int? num = int.tryParse(amountController.text);
-                          if (num == null || num <= 0) {
+                          if (num == null || num < 0) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Please enter a valid amount!'),
@@ -312,33 +316,45 @@ class TransactionsTool extends ChangeNotifier {
     );
   }
 
-  Future<void> deleteTransaction(BuildContext context, String docId) async {
+  Future<void> deleteTransaction(
+      bool mounted, BuildContext context, String docId) async {
     try {
       await transactions.doc(docId).delete();
-      Provider.of<Global>(context, listen: false).getTransactionsDetails();
-      Provider.of<Global>(context, listen: false).getDebitTransactions();
-      Provider.of<Global>(context, listen: false).getCreditTransactions();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Transaction deleted successfully!')),
-      );
+
+      // Ensure widget is still mounted before accessing context or calling Provider
+      if (!mounted) return;
+
+      // Delay the execution to ensure widget is mounted
+      Future.microtask(() {
+        if (!mounted) return;
+
+        Provider.of<Global>(context, listen: false).getTransactionsDetails();
+        Provider.of<Global>(context, listen: false).getDebitTransactions();
+        Provider.of<Global>(context, listen: false).getCreditTransactions();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Transaction deleted successfully!')),
+        );
+      });
     } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to delete transaction: $e')),
       );
     }
   }
 
-  Future<void> updateTransaction(BuildContext context, String docId,
-      Map<String, dynamic> currentData) async {
+  Future<void> updateTransaction(bool mounted, BuildContext context,
+      String docId, Map<String, dynamic> currentData) async {
     final TextEditingController updateAmountController =
         TextEditingController(text: currentData['price'].toString());
     String dropdownValue = currentData['name'];
     bool currentSwitchValue = currentData['credit'];
 
-    // Convert Firestore Timestamp to DateTime
     DateTime currentDateTime = (currentData['date'] is Timestamp)
         ? (currentData['date'] as Timestamp).toDate()
-        : currentData['date']; // Handle DateTime if it's already DateTime
+        : currentData['date'];
 
     await showModalBottomSheet<void>(
       isScrollControlled: true,
@@ -348,10 +364,11 @@ class TransactionsTool extends ChangeNotifier {
           builder: (BuildContext modalContext, StateSetter modalSetState) {
             return Padding(
               padding: EdgeInsets.only(
-                  top: 20,
-                  right: 20,
-                  left: 20,
-                  bottom: MediaQuery.of(ctx).viewInsets.bottom + 20),
+                top: 20,
+                right: 20,
+                left: 20,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,10 +382,8 @@ class TransactionsTool extends ChangeNotifier {
                     icon: const Icon(Icons.search),
                     elevation: 16,
                     style: const TextStyle(color: Colors.deepPurple),
-                    underline: Container(
-                      height: 2,
-                      color: Colors.deepPurpleAccent,
-                    ),
+                    underline:
+                        Container(height: 2, color: Colors.deepPurpleAccent),
                     onChanged: (String? value) {
                       if (value != null) {
                         modalSetState(() {
@@ -419,27 +434,31 @@ class TransactionsTool extends ChangeNotifier {
                     children: [
                       ElevatedButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(color: Colors.red),
-                        ),
+                        child: const Text("Cancel",
+                            style: TextStyle(color: Colors.red)),
                       ),
                       ElevatedButton(
                         onPressed: () async {
                           final int? updatedPrice =
                               int.tryParse(updateAmountController.text);
                           if (updatedPrice != null) {
-                            // Convert DateTime to Timestamp
                             Timestamp updatedTimestamp =
                                 Timestamp.fromDate(currentDateTime);
+
+                            if (!mounted)
+                              return; // Ensure widget is still mounted
 
                             await transactions.doc(docId).update({
                               'name': dropdownValue,
                               'price': updatedPrice,
-                              'date': updatedTimestamp, // Use Timestamp
+                              'date': updatedTimestamp,
                               'credit': currentSwitchValue,
                             });
+
                             Navigator.pop(ctx);
+
+                            if (!mounted)
+                              return; // Ensure widget is still mounted
                             Provider.of<Global>(context, listen: false)
                                 .getTransactionsDetails();
                             Provider.of<Global>(context, listen: false)
@@ -448,10 +467,8 @@ class TransactionsTool extends ChangeNotifier {
                                 .getCreditTransactions();
                           }
                         },
-                        child: const Text(
-                          "Update",
-                          style: TextStyle(color: Colors.green),
-                        ),
+                        child: const Text("Update",
+                            style: TextStyle(color: Colors.green)),
                       ),
                     ],
                   ),

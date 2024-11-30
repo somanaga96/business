@@ -104,6 +104,11 @@ class Global extends ChangeNotifier {
       ExpenseTool expenseTool = ExpenseTool();
       List<Expense> expenses =
           await expenseTool.fetchCurrentMonthExpenseFromDB(_selectedDate);
+      // for (var expense in expenses) {
+      //   print('Expense Name: ${expense.name.toString()}');
+      //   print('Expense date: ${expense.date.toString()}');
+      //   print('Expense credit: ${expense.credit.toString()}');
+      // }
       expenseList.addAll(expenses);
       notifyListeners();
     } catch (error) {
