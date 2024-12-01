@@ -143,6 +143,10 @@ class TransactionsTool extends ChangeNotifier {
     'முட்டை',
     'எண்ணெய்',
     'பேக்கரி',
+    'பூடா பேக்கிங்',
+    'குர்குரே Tasganes',
+    'குர்குரே Dahiwadi',
+    'அக்தர்',
     'மைதா',
     'கலர்',
     'சீனி',
@@ -153,7 +157,6 @@ class TransactionsTool extends ChangeNotifier {
     'விறகு',
     'டீசல்',
     'driver சம்பளம்',
-    'பூடா பேக்கிங்',
     'மசாலா'
   ];
   final List _tenureTypes = ["வரவு", "செலவு"];
