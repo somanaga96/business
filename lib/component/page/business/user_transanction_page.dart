@@ -1,26 +1,33 @@
-import 'package:business/component/page/business/user_transanction_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import '../../cards/user_transaction_card.dart';
+import '../../utils/business_crud/month_selection_page.dart';
 import '../../utils/business_crud/transactions_tool.dart';
 import '../../utils/global.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
-class BusinessTransactions extends StatefulWidget {
-  const BusinessTransactions({super.key});
+class UserTransactionPage extends StatefulWidget {
+  final String name;
+
+  const UserTransactionPage({super.key, required this.name});
 
   @override
-  State<BusinessTransactions> createState() => _BusinessTransactionsState();
+  State<UserTransactionPage> createState() => _UserTransactionPageState();
 }
 
-class _BusinessTransactionsState extends State<BusinessTransactions> {
+class _UserTransactionPageState extends State<UserTransactionPage> {
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    Provider.of<Global>(context, listen: false)
+        .getUserTotalTransactionsDetails(widget.name);
+    Provider.of<Global>(context, listen: false)
+        .getUserTransactionTotal(widget.name);
     fetchData();
+    Provider.of<Global>(context, listen: false).setName(widget.name);
   }
 
   void fetchData() async {
@@ -33,7 +40,7 @@ class _BusinessTransactionsState extends State<BusinessTransactions> {
     setState(() {
       isLoading = true;
     });
-    fetchData(); // Refresh the data
+    fetchData();
   }
 
   @override
@@ -46,27 +53,51 @@ class _BusinessTransactionsState extends State<BusinessTransactions> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (global.purchaseList.isEmpty) {
-          return const Center(
-              child: Text('No live transactions are available.'));
+        if (global.userTotalTransactionList.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('${widget.name} Transactions'),
+            ),
+            body: Column(
+              children: [
+                UserTransactionCard(title: widget.name),
+                const MonthSelectionPage(),
+                const Center(
+                  child: Text('No live transactions are available.'),
+                ),
+              ],
+            ),
+          );
         }
 
-        return Expanded(
-          child: ListView.builder(
-            itemCount: global.purchaseList.length,
-            itemBuilder: (BuildContext context, int index) {
-              final transaction = global.purchaseList[index];
-              final DateFormat formatter = DateFormat('d-MMM-yy');
-              final String dateAndMonth = formatter.format(transaction.date);
-              final bool credit = transaction.credit;
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('${widget.name} Transactions'),
+          ),
+          body: Column(
+            children: <Widget>[
+              UserTransactionCard(title: widget.name),
+              const MonthSelectionPage(),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: global.userTotalTransactionList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final transaction = global.userTotalTransactionList[index];
+                    final DateFormat formatter = DateFormat('d-MMM-yy');
+                    final String dateAndMonth =
+                        formatter.format(transaction.date);
+                    final bool credit = transaction.credit;
 
-              return TransactionItem(
-                transaction: transaction,
-                dateAndMonth: dateAndMonth,
-                transactionsTool: transactionsTool,
-                creditName: credit, // Pass callback
-              );
-            },
+                    return TransactionItem(
+                      transaction: transaction,
+                      dateAndMonth: dateAndMonth,
+                      transactionsTool: transactionsTool,
+                      creditName: credit,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -75,17 +106,18 @@ class _BusinessTransactionsState extends State<BusinessTransactions> {
 }
 
 class TransactionItem extends StatefulWidget {
-  final transaction;
+  final dynamic transaction;
   final String dateAndMonth;
   final TransactionsTool transactionsTool;
   final bool creditName;
 
-  const TransactionItem(
-      {super.key,
-      required this.transaction,
-      required this.dateAndMonth,
-      required this.transactionsTool,
-      required this.creditName});
+  const TransactionItem({
+    super.key,
+    required this.transaction,
+    required this.dateAndMonth,
+    required this.transactionsTool,
+    required this.creditName,
+  });
 
   @override
   _TransactionItemState createState() => _TransactionItemState();
@@ -112,7 +144,7 @@ class _TransactionItemState extends State<TransactionItem> {
                   'credit': widget.transaction.credit,
                   'date': widget.transaction.date,
                 },
-              ); // Refresh after update
+              );
             },
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
@@ -162,13 +194,11 @@ class _TransactionItemState extends State<TransactionItem> {
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: ListTile(
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: ListTile(
             title: Text(
               widget.transaction.name,
               style: TextStyle(
@@ -180,18 +210,7 @@ class _TransactionItemState extends State<TransactionItem> {
               style: TextStyle(
                   fontSize: 18.0,
                   color: widget.creditName ? Colors.green : Colors.red),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UserTransactionPage(
-                          name: widget.transaction.name,
-                        )),
-              );
-            },
-          ),
-        ),
+            )),
       ),
     );
   }

@@ -129,6 +129,82 @@ class TransactionsTool extends ChangeNotifier {
     return objectList;
   }
 
+  Future<List<Transactions>> fetchCurrentMonthUserPurchaseFromDB(
+      String name, DateTime date) async {
+    List<Transactions> objectList = [];
+
+    try {
+      // Get the first day of the month
+      DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
+
+      // Get the last day of the month
+      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 23, minutes: 59, seconds: 59));
+
+      // Fetch the data within the current month range
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('transanction')
+              .where('name', isEqualTo: name)
+              .where('date',
+                  isGreaterThanOrEqualTo: Timestamp.fromDate(firstDayOfMonth))
+              .where('date',
+                  isLessThanOrEqualTo: Timestamp.fromDate(lastDayOfMonth))
+              .orderBy('date', descending: true)
+              .get();
+
+      // Iterate through the documents and convert them into a list of Transactions objects
+      for (var doc in querySnapshot.docs) {
+        Transactions yourObject = Transactions.fromMap(doc.id, doc.data());
+        objectList.add(yourObject);
+      }
+    } catch (e) {
+      debugPrint("Error fetching purchases: $e");
+    }
+
+    notifyListeners(); // Notify listeners if you're using a state management solution like ChangeNotifier.
+    return objectList;
+  }
+
+  Future<String> userTotalAmount(String name, DateTime date) async {
+    int totalPrice = 0;
+
+    try {
+      // Get the first day of the month
+      DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
+
+      // Get the last day of the month
+      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 23, minutes: 59, seconds: 59));
+
+      // Fetch the data within the current month range
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('transanction')
+              .where('name', isEqualTo: name)
+              .where('date',
+                  isGreaterThanOrEqualTo: Timestamp.fromDate(firstDayOfMonth))
+              .where('date',
+                  isLessThanOrEqualTo: Timestamp.fromDate(lastDayOfMonth))
+              .orderBy('date', descending: true)
+              .get();
+      for (var doc in querySnapshot.docs) {
+        Transactions yourObject = Transactions.fromMap(doc.id, doc.data());
+        // Add the price to the total price
+        totalPrice += yourObject.price;
+      }
+    } catch (e) {
+      debugPrint("Error fetching purchases: $e");
+    }
+
+    notifyListeners(); // Notify listeners if you're using a state management solution like ChangeNotifier.
+
+    // Return both the objectList and the totalPrice
+    return totalPrice.toString();
+  }
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
   DateTime dateTime = DateTime.now();

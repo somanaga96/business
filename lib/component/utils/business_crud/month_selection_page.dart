@@ -30,6 +30,8 @@ class _MonthSelectionPageState extends State<MonthSelectionPage> {
             global.setSelectedDate(newDate);
             // Call methods to update transaction data
             global.getTransactionsDetails();
+            Provider.of<Global>(context, listen: false)
+                .getUserTotalTransactionsDetails(global.getName());
           }
         },
         child: Text(DateFormat('MMMM/y').format(global.selectedDate)),

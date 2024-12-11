@@ -9,6 +9,13 @@ import 'business_crud/user_tool.dart';
 
 class Global extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
+  String _name = "வியாபாரம்";
+
+  void setName(String name) {
+    _name = name;
+  }
+
+  String getName() => _name;
 
   void setSelectedDate(DateTime date) {
     _selectedDate = date;
@@ -18,6 +25,7 @@ class Global extends ChangeNotifier {
     getCurrentMonthExpenseTransaction();
     getCurrentMonthExpenseGivenTotal();
     getCurrentMonthExpenseBoughtTotal();
+    getUserTransactionTotal(_name);
   }
 
   DateTime get selectedDate => _selectedDate;
@@ -148,6 +156,41 @@ class Global extends ChangeNotifier {
       ExpenseTool expenseTool = ExpenseTool();
       _expenseBoughtTotal =
           await expenseTool.fetchCurrentMonthBoughtSum(_selectedDate);
+      notifyListeners();
+    } catch (error) {
+      print('Error fetching users: $error');
+    }
+  }
+
+  //userTotalTransactionList details
+  List<Transactions> userTotalTransactionList = [];
+
+  void getUserTotalTransactionsDetails(String name) async {
+    userTotalTransactionList.clear();
+    try {
+      TransactionsTool transactionsTool = TransactionsTool();
+      List<Transactions> purchases = await transactionsTool
+          .fetchCurrentMonthUserPurchaseFromDB(name, _selectedDate);
+      userTotalTransactionList.addAll(purchases);
+      notifyListeners();
+    } catch (error) {
+      print('Error fetching users: $error');
+    }
+  }
+
+  //userTotal
+  String _userTotal = "";
+
+  String get userTotal => _userTotal;
+
+  set userTotal(String value) {
+    _userTotal = value;
+  }
+
+  void getUserTransactionTotal(String name) async {
+    try {
+      TransactionsTool transactionsTool = TransactionsTool();
+      _userTotal = await transactionsTool.userTotalAmount(name, _selectedDate);
       notifyListeners();
     } catch (error) {
       print('Error fetching users: $error');
