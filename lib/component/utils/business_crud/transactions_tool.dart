@@ -222,6 +222,7 @@ class TransactionsTool extends ChangeNotifier {
     'பூடா பேக்கிங்',
     'குர்குரே Tasganes',
     'குர்குரே Dahiwadi',
+    'பல்டன்',
     'அக்தர்',
     'மைதா',
     'கலர்',
