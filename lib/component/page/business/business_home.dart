@@ -23,35 +23,12 @@ class _BusinessHomeState extends State<BusinessHome> {
     Provider.of<Global>(context, listen: false).getTransactionsDetails();
     Provider.of<Global>(context, listen: false).getCreditTransactions();
     Provider.of<Global>(context, listen: false).getDebitTransactions();
+    Provider.of<Global>(context, listen: false).setAppTitle('Home Expense');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Center(child: Text('Business Home')),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomePage(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Logout'),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.lightBlue,
-      ),
       body: const Column(
         children: [
           PurchaseIncomeCard(),

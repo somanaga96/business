@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 
 import '../utils/global.dart';
 
-class UserCard extends StatelessWidget {
+class UserExpenseCard extends StatelessWidget {
   final String title;
 
-  const UserCard({super.key, required this.title});
+  const UserExpenseCard({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +25,14 @@ class UserCard extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'மொத்தம்', // "Income" in Tamil
+                        'வாங்கியது', // "Income" in Tamil
                         style: TextStyle(
                           fontSize: (screenSize.width / 20),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        global.userExpenseGivenTotal, // "Expense" in Tamil
+                        global.userExpenseBoughtTotal, // "Expense" in Tamil
                         style: TextStyle(
                           fontSize: (screenSize.width / 20),
                           fontWeight: FontWeight.bold,
@@ -52,20 +52,20 @@ class UserCard extends StatelessWidget {
                 child: Center(
                   child: Column(
                     children: [
-                      // Text(
-                      //   "கொடுத்தது", // "Expense" in Tamil
-                      //   style: TextStyle(
-                      //     fontSize: (screenSize.width / 20),
-                      //     fontWeight: FontWeight.bold,
-                      //   ),
-                      // ),
-                      // Text(
-                      //   global.expenseGivenTotal, // "Expense" in Tamil
-                      //   style: TextStyle(
-                      //     fontSize: (screenSize.width / 20),
-                      //     fontWeight: FontWeight.bold,
-                      //   ),
-                      // ),
+                      Text(
+                        "கொடுத்தது", // "Expense" in Tamil
+                        style: TextStyle(
+                          fontSize: (screenSize.width / 20),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        global.userExpenseGivenTotal, // "Expense" in Tamil
+                        style: TextStyle(
+                          fontSize: (screenSize.width / 20),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),

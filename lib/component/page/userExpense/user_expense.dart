@@ -4,26 +4,30 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../../utils/global.dart';
-import '../userExpense/user_individual_page.dart';
 
-class ExpenseTransactions extends StatefulWidget {
-  const ExpenseTransactions({super.key});
+class UserTransactions extends StatefulWidget {
+  final String name;
+
+  const UserTransactions({super.key, required this.name});
 
   @override
-  State<ExpenseTransactions> createState() => _ExpenseTransactionsState();
+  State<UserTransactions> createState() => _UserTransactionsState();
 }
 
-class _ExpenseTransactionsState extends State<ExpenseTransactions> {
+class _UserTransactionsState extends State<UserTransactions> {
   bool isLoading = true;
+  Global global = Global();
 
   @override
   void initState() {
     super.initState();
-    print('Fetching data...');
-    fetchData();
+    fetchUserExpenses();
+    global.setName(widget.name);
   }
 
-  void fetchData() async {
+  Future<void> fetchUserExpenses() async {
+    Provider.of<Global>(context, listen: false)
+        .getUserTotalExpenseList(widget.name);
     setState(() {
       isLoading = false;
     });
@@ -35,7 +39,7 @@ class _ExpenseTransactionsState extends State<ExpenseTransactions> {
       isLoading = true;
     });
     print('Refreshing transactions...');
-    fetchData(); // Refresh the data
+    fetchUserExpenses();
   }
 
   @override
@@ -46,19 +50,20 @@ class _ExpenseTransactionsState extends State<ExpenseTransactions> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (global.expenseList.isEmpty) {
+        if (global.userTotalExpenseList.isEmpty) {
+          print('userTotalExpenseList is empty.');
           return const Center(
               child: Text('No live transactions are available.'));
         }
 
         print(
-            'Expense List transaction Loaded: ${global.expenseList.length} transactions.');
+            'User Expense List Loaded: ${global.userTotalExpenseList.length} transactions.');
 
         return Expanded(
           child: ListView.builder(
-            itemCount: global.expenseList.length,
+            itemCount: global.userTotalExpenseList.length,
             itemBuilder: (BuildContext context, int index) {
-              final transaction = global.expenseList[index];
+              final transaction = global.userTotalExpenseList[index];
               final DateFormat formatter = DateFormat('d-MMM-yy');
               final String dateAndMonth = formatter.format(transaction.date);
               final bool credit = transaction.credit;
@@ -113,12 +118,11 @@ class _TransactionItemState extends State<TransactionItem> {
         children: [
           SlidableAction(
             onPressed: (context) async {
-              if (!mounted) return; // Ensure widget is still mounted
+              if (!mounted) return;
 
               print(
                   'Update action triggered for expense ID: ${widget.transaction.id}');
 
-              // Prepare the data to pass to updateExpense
               Map<String, dynamic> currentData = {
                 'name': widget.transaction.name,
                 'amount': widget.transaction.amount,
@@ -127,12 +131,11 @@ class _TransactionItemState extends State<TransactionItem> {
                 'comments': widget.transaction.comments
               };
 
-              // Call the updateExpense method
               await widget.expenseTransactionsTool.updateExpense(
-                mounted, // Pass mounted to ensure widget is still active
+                mounted,
                 context,
-                widget.transaction.id, // Pass the expense ID
-                currentData, // Pass the current data to populate the fields
+                widget.transaction.id,
+                currentData,
               );
             },
             backgroundColor: Colors.blue,
@@ -142,12 +145,11 @@ class _TransactionItemState extends State<TransactionItem> {
           ),
           SlidableAction(
             onPressed: (context) async {
-              if (!mounted) return; // Ensure widget is still mounted
+              if (!mounted) return;
 
               print(
                   'Delete action triggered for transaction ID: ${widget.transaction.id}');
 
-              // Confirm before deleting the expense
               bool? confirmDelete = await showDialog<bool>(
                 context: context,
                 builder: (BuildContext context) {
@@ -169,9 +171,8 @@ class _TransactionItemState extends State<TransactionItem> {
                 },
               );
 
-              // Delete the expense if confirmed
               if (confirmDelete == true) {
-                if (!mounted) return; // Ensure widget is still mounted
+                if (!mounted) return;
                 await widget.expenseTransactionsTool
                     .deleteExpense(context, widget.transaction.id);
                 print('Deleted transaction: ${widget.transaction.name}');
@@ -191,51 +192,35 @@ class _TransactionItemState extends State<TransactionItem> {
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(15.0),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: ListTile(
+          title: Row(
+            children: [
+              Text(
+                '${widget.transaction.name}',
+                style: TextStyle(
+                  color: widget.creditName ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(width: screenSize.width / 6),
+              Text(
+                '${widget.transaction.comments}',
+                style: const TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+            ],
           ),
-          child: ListTile(
-            title: Row(
-              // mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  '${widget.transaction.name}',
-                  style: TextStyle(
-                    color: widget.creditName ? Colors.green : Colors.red,
-                    fontWeight:
-                        FontWeight.bold, // Optional for better distinction
-                  ),
-                ),
-                SizedBox(width: screenSize.width / 6),
-                Text(
-                  '${widget.transaction.comments}',
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            subtitle: Text(widget.dateAndMonth),
-            trailing: Text(
-              widget.amount.toString(),
-              style: TextStyle(
-                  fontSize: 18.0,
-                  color: widget.creditName ? Colors.green : Colors.red),
-            ),
-            onTap: () {
-              print(
-                  'Navigating to transaction details for ${widget.transaction.name}');
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UserIndividualPage(
-                          name: widget.transaction.name,
-                        )),
-              );
-            },
+          subtitle: Text(widget.dateAndMonth),
+          trailing: Text(
+            widget.amount.toString(),
+            style: TextStyle(
+                fontSize: 18.0,
+                color: widget.creditName ? Colors.green : Colors.red),
           ),
         ),
       ),

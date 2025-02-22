@@ -34,6 +34,8 @@ class _MonthSelectionPageState extends State<MonthSelectionPage> {
                 .getUserTotalTransactionsDetails(global.getName());
             Provider.of<Global>(context, listen: false)
                 .getCurrentMonthExpenseTransaction();
+            Provider.of<Global>(context, listen: false)
+                .getUserTotalExpenseList(global.getName());
           }
         },
         child: Text(DateFormat('MMMM/y').format(global.selectedDate)),

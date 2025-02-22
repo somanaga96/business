@@ -1,5 +1,6 @@
 import 'package:business/component/page/business/business_home.dart';
 import 'package:business/component/page/expense/expense_home.dart';
+import 'package:business/component/page/settings/Settings.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -16,7 +17,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   void initState() {
     super.initState();
-    screen = [BusinessHome(), ExpenseHome(), BusinessHome()];
+    screen = [BusinessHome(), ExpenseHome(), Egg()];
   }
 
   @override

@@ -4,13 +4,13 @@ import 'package:flutter/cupertino.dart';
 import '../../entity/purchase.dart';
 
 class ProductTool extends ChangeNotifier {
-  Future<List<Product>> fetchProductProductsFromDB() async {
-    List<Product> objectList = [];
+  Future<List<Products>> fetchProductProductsFromDB() async {
+    List<Products> objectList = [];
     try {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await FirebaseFirestore.instance.collection('expense').get();
       for (var doc in querySnapshot.docs) {
-        Product product = Product.fromMap(doc.id, doc.data());
+        Products product = Products.fromMap(doc.id, doc.data());
         objectList.add(product);
       }
     } catch (e) {

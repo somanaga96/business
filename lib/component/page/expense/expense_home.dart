@@ -28,14 +28,12 @@ class _ExpenseHomeState extends State<ExpenseHome> {
         .getCurrentMonthExpenseGivenTotal();
     Provider.of<Global>(context, listen: false)
         .getCurrentMonthExpenseBoughtTotal();
+    Provider.of<Global>(context, listen: false).setAppTitle("Expense Home");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Expense Home"),
-      ),
       body: const Column(
         children: [
           ExpenseIncomeCard(),

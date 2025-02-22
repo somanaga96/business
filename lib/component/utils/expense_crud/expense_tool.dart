@@ -568,6 +568,47 @@ class ExpenseTransactionsTool extends ChangeNotifier {
               .where('date',
                   isLessThanOrEqualTo: Timestamp.fromDate(lastDayOfMonth))
               .orderBy('date', descending: false)
+              .where('credit', isEqualTo: true)
+              .where('name', isEqualTo: name)
+              .get();
+      // Iterate through the documents and convert them into a list of Transactions objects
+      for (var doc in querySnapshot.docs) {
+        Expense yourObject = Expense.fromMap(doc.id, doc.data());
+        objectList.add(yourObject);
+
+        // Add the price to the total price
+        totalPrice += yourObject.amount;
+      }
+    } catch (e) {
+      debugPrint("Error fetching expense list: $e");
+    }
+
+    notifyListeners(); // Notify listeners if you're using a state management solution like ChangeNotifier.
+
+    // Return both the objectList and the totalPrice
+    return totalPrice.toString();
+  }
+
+//user expense bought total
+  Future<String> userExpenseBoughtTotalAmount(
+      String name, DateTime date) async {
+    List<Expense> objectList = [];
+    int totalPrice = 0;
+    try {
+      DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
+
+      // Get the last day of the month
+      DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .add(const Duration(hours: 23, minutes: 59, seconds: 59));
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('expense')
+              .where('date',
+                  isGreaterThanOrEqualTo: Timestamp.fromDate(firstDayOfMonth))
+              .where('date',
+                  isLessThanOrEqualTo: Timestamp.fromDate(lastDayOfMonth))
+              .orderBy('date', descending: false)
               .where('credit', isEqualTo: false)
               .where('name', isEqualTo: name)
               .get();

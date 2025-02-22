@@ -29,7 +29,7 @@ class _UserTransactionPageState extends State<UserTransactionPage> {
     Provider.of<Global>(context, listen: false)
         .getUserTransactionTotal(widget.name);
     Provider.of<Global>(context, listen: false)
-        .getUserTotalExpenseDetails(widget.name);
+        .getUserTotalExpenseList(widget.name);
     fetchData();
     Provider.of<Global>(context, listen: false).setName(widget.name);
   }

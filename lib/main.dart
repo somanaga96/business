@@ -1,5 +1,6 @@
 import 'package:business/component/firebase/firebase_options.dart';
 import 'package:business/component/page/home.dart';
+
 // import 'package:business/component/page/home.dart';
 import 'package:business/component/utils/global.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import 'component/bottom_navigation.dart';
 import 'component/page/business/business_home.dart';
+import 'component/utils/side_bar.dart';
 // import 'component/bottom_navigation.dart';
 
 Future<void> main() async {
@@ -30,7 +32,8 @@ class Home extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: const BusinessHome(),
-      home: const BottomNavigation(),
+      home: SideMenuPage(),
+      // home: const BottomNavigation(),
     );
   }
 }

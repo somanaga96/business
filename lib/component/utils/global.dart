@@ -1,5 +1,6 @@
 import 'package:business/component/entity/expense.dart';
 import 'package:business/component/entity/purchase.dart';
+import 'package:business/component/page/user/user_crud.dart';
 import 'package:business/component/utils/purchase_crud/purchase_tool.dart';
 
 // import 'package:business/component/utils/expense_crud/expense_tool.dart';
@@ -7,16 +8,33 @@ import 'package:flutter/cupertino.dart';
 
 import '../entity/user.dart';
 import '../entity/transaction.dart';
+import '../entity/users.dart';
+import '../page/products/product_crud.dart';
+import '../page/products/product_page.dart';
 import 'business_crud/business_transactions_tool.dart';
 import 'user_crud/user_tool.dart';
 import 'expense_crud/expense_tool.dart';
 
 class Global extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
-  String _name = "வியாபாரம்";
+  String _businessName = "வியாபாரம்";
+  String _name = "";
+  String _appTitle = "Business Home";
+
+  void setAppTitle(String name) {
+    _appTitle = name;
+  }
+
+  String getAppTitle() => _appTitle;
+
+  void setBusinessName(String name) {
+    _businessName = name;
+  }
+
+  String getBusinessName() => _businessName;
 
   void setName(String name) {
-    _name = name;
+    _businessName = name;
   }
 
   String getName() => _name;
@@ -26,10 +44,15 @@ class Global extends ChangeNotifier {
     notifyListeners();
     getCreditTransactions();
     getDebitTransactions();
-    // getCurrentMonthExpenseTransaction();
-    // getCurrentMonthExpenseGivenTotal();
-    // getCurrentMonthExpenseBoughtTotal();
-    getUserTransactionTotal(_name);
+    getCurrentMonthExpenseTransaction();
+    getCurrentMonthExpenseGivenTotal();
+    getCurrentMonthExpenseBoughtTotal();
+    getUserTransactionTotal(_businessName);
+    getUserTotalExpenseList(_name);
+    getUserTotalExpenseList(_name);
+
+    // getUserExpenseGivenTotal(_name);
+    // getUserExpenseBoughtTotal(_name);
   }
 
   DateTime get selectedDate => _selectedDate;
@@ -206,7 +229,7 @@ class Global extends ChangeNotifier {
   //userTotalExpenseList details
   List<Expense> userTotalExpenseList = [];
 
-  void getUserTotalExpenseDetails(String name) async {
+  void getUserTotalExpenseList(String name) async {
     userTotalExpenseList.clear();
     try {
       ExpenseTransactionsTool expenseTool = ExpenseTransactionsTool();
@@ -219,12 +242,12 @@ class Global extends ChangeNotifier {
     }
   }
 
-  // //userExpenseTotal
+  // //userGivenExpenseTotal
   String _userExpenseGivenTotal = "";
 
   String get userExpenseGivenTotal => _userExpenseGivenTotal;
 
-  set userExpenseCreditTotal(String value) {
+  set userExpenseGivenTotal(String value) {
     _userExpenseGivenTotal = value;
   }
 
@@ -239,18 +262,80 @@ class Global extends ChangeNotifier {
     }
   }
 
+  // //userBoughtExpenseTotal
+  String _userExpenseBoughtTotal = "";
+
+  String get userExpenseBoughtTotal => _userExpenseBoughtTotal;
+
+  set userExpenseBoughtTotal(String value) {
+    _userExpenseBoughtTotal = value;
+  }
+
+  void getUserExpenseBoughtTotal(String name) async {
+    try {
+      ExpenseTransactionsTool transactionsTool = ExpenseTransactionsTool();
+      _userExpenseBoughtTotal = await transactionsTool
+          .userExpenseBoughtTotalAmount(name, _selectedDate);
+      notifyListeners();
+    } catch (error) {
+      print('Error fetching getUserTransactionTotal: $error');
+    }
+  }
+
   //products details
-  List<Product> productsList = [];
+  List<Products> productsList = [];
 
   void getProductsList() async {
     productsList.clear();
     try {
       ProductTool productTool = ProductTool();
-      List<Product> products = await productTool.fetchProductProductsFromDB();
+      List<Products> products = await productTool.fetchProductProductsFromDB();
       productsList.addAll(products);
       notifyListeners();
     } catch (error) {
       print('Error fetching getProductsList: $error');
     }
   }
+
+  //list of Users
+  List<Users> _customerList = [];
+
+  void fetchCustomerList() async {
+    _customerList.clear(); // Clear the list to avoid duplicates
+    try {
+      UserCrud tool = UserCrud(); // Assuming this fetches user data
+      List<Users> liveTransactions = await tool.fetchUserList();
+      _customerList
+          .addAll(liveTransactions); // Add the fetched users to the list
+      print(
+          'Customer list: $_customerList'); // Print the customer list in console
+      notifyListeners(); // Notify listeners to rebuild UI
+    } catch (error) {
+      print('Error fetching users: $error'); // Handle errors gracefully
+    }
+  }
+
+  // Getter to access the products list
+  List<Users> get customerList => _customerList;
+
+  //list of Users
+  List<Products> _productList = [];
+
+  void fetchProductList() async {
+    _productList.clear(); // Clear the list to avoid duplicates
+    try {
+      ProductCrud tool = ProductCrud(); // Assuming this fetches user data
+      List<Products> liveTransactions = await tool.fetchProductList();
+      _productList
+          .addAll(liveTransactions); // Add the fetched users to the list
+      print(
+          'Customer list: $_customerList'); // Print the customer list in console
+      notifyListeners(); // Notify listeners to rebuild UI
+    } catch (error) {
+      print('Error fetching users: $error'); // Handle errors gracefully
+    }
+  }
+
+  // Getter to access the customer list
+  List<Products> get productList => _productList;
 }
