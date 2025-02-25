@@ -2,16 +2,13 @@ import 'package:business/component/entity/expense.dart';
 import 'package:business/component/entity/purchase.dart';
 import 'package:business/component/page/user/user_crud.dart';
 import 'package:business/component/utils/purchase_crud/purchase_tool.dart';
-
-// import 'package:business/component/utils/expense_crud/expense_tool.dart';
 import 'package:flutter/cupertino.dart';
-
 import '../entity/user.dart';
 import '../entity/transaction.dart';
 import '../entity/users.dart';
 import '../page/products/product_crud.dart';
-import '../page/products/product_page.dart';
 import 'business_crud/business_transactions_tool.dart';
+import 'cumulative_crud/cumulative_crud.dart';
 import 'user_crud/user_tool.dart';
 import 'expense_crud/expense_tool.dart';
 
@@ -336,6 +333,28 @@ class Global extends ChangeNotifier {
     }
   }
 
-  // Getter to access the customer list
   List<Products> get productList => _productList;
+
+// List to store cumulative expenses for each user
+  List<Map<String, dynamic>> cumulativeExpenses = [];
+
+  // Getter to access the cumulative expenses data
+  List<Map<String, dynamic>> get getCumulativeExpenses => cumulativeExpenses;
+
+  // Fetch cumulative user expenses asynchronously
+  Future<void> fetchCumulativeUserExpense() async {
+    // cumulativeExpenses.clear();
+    try {
+      CustomerExpenseService customerExpenseService = CustomerExpenseService();
+
+      // Await the result from fetchCumulativeUserExpenses and assign it to the cumulativeExpenses
+      cumulativeExpenses =
+          await customerExpenseService.fetchCumulativeUserExpenses();
+
+      // Optionally log the cumulative expenses
+      print('Fetched cumulative expenses: $cumulativeExpenses');
+    } catch (e) {
+      print('Error fetching cumulative expenses: $e');
+    }
+  }
 }

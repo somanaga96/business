@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../page/cumulative/business/business_transaction_cumulative.dart';
 import '../utils/global.dart';
 
 class PurchaseIncomeCard extends StatelessWidget {
@@ -44,29 +45,38 @@ class PurchaseIncomeCard extends StatelessWidget {
               ),
             ),
             // Expense Card
-            Card(
-              color: Colors.red[500],
-              child: SizedBox(
-                width: screenSize.width / 2.1,
-                height: screenSize.height / 6,
-                child: Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        "செலவு", // "Expense" in Tamil
-                        style: TextStyle(
-                          fontSize: (screenSize.width / 20),
-                          fontWeight: FontWeight.bold,
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ExpenseCumulative()),
+                );
+              },
+              child: Card(
+                color: Colors.red[500],
+                child: SizedBox(
+                  width: screenSize.width / 2.1,
+                  height: screenSize.height / 6,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          "செலவு", // "Expense" in Tamil
+                          style: TextStyle(
+                            fontSize: (screenSize.width / 20),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        global.purchaseDebiList, // "Expense" in Tamil
-                        style: TextStyle(
-                          fontSize: (screenSize.width / 20),
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          global.purchaseDebiList, // "Expense" in Tamil
+                          style: TextStyle(
+                            fontSize: (screenSize.width / 20),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
