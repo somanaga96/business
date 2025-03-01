@@ -3,6 +3,7 @@ import 'package:business/component/entity/purchase.dart';
 import 'package:business/component/page/user/user_crud.dart';
 import 'package:business/component/utils/purchase_crud/purchase_tool.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import '../entity/user.dart';
 import '../entity/transaction.dart';
 import '../entity/users.dart';
@@ -13,6 +14,25 @@ import 'user_crud/user_tool.dart';
 import 'expense_crud/expense_tool.dart';
 
 class Global extends ChangeNotifier {
+  bool _isDarkMode = false;
+
+  bool get isDarkMode => _isDarkMode;
+  final ThemeData _lightTheme =
+      ThemeData(primarySwatch: Colors.blue, brightness: Brightness.light);
+
+  final ThemeData _darkTheme =
+      ThemeData(primarySwatch: Colors.blue, brightness: Brightness.dark);
+
+  ThemeData getTheme() {
+    return _isDarkMode ? _darkTheme : _lightTheme;
+  }
+
+  // Method to toggle theme mode
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode; // Toggle the theme mode
+    notifyListeners();
+  }
+
   DateTime _selectedDate = DateTime.now();
   String _businessName = "வியாபாரம்";
   String _name = "";
@@ -47,6 +67,7 @@ class Global extends ChangeNotifier {
     getUserTransactionTotal(_businessName);
     getUserTotalExpenseList(_name);
     getUserTotalExpenseList(_name);
+    fetchCumulativeUserExpense();
 
     // getUserExpenseGivenTotal(_name);
     // getUserExpenseBoughtTotal(_name);

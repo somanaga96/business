@@ -1,3 +1,4 @@
+import 'package:business/component/utils/global.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import '../../entity/expense.dart';
@@ -5,8 +6,18 @@ import '../../entity/users.dart';
 import '../../page/user/user_crud.dart';
 
 class CustomerExpenseService extends ChangeNotifier {
+  Global global = Global();
+
   // Fetch the list of users and their cumulative expenses
   Future<List<Map<String, dynamic>>> fetchCumulativeUserExpenses() async {
+    // DateTime dateTimes=DateTime.now();
+    DateTime date = global.selectedDate;
+    // DateTime date = '2025-02-01 20:57:59.254487' as DateTime;
+    print('Date: ${date}');
+    DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
+
+    // Get the last day of the month
+    DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 1);
     List<Map<String, dynamic>> cumulativeExpenses =
         []; // Local list to store cumulative expenses
 
@@ -16,18 +27,25 @@ class CustomerExpenseService extends ChangeNotifier {
       List<Users> customers = await userCrud.fetchUserList();
 
       for (var customer in customers) {
+        print('Customer ID: ${customer.id}, Name: ${customer.name}');
         int totalExpense = 0;
 
         // Step 2: Fetch all expenses for the current user by userId from the 'expenses' collection
         QuerySnapshot<Map<String, dynamic>> expenseSnapshot =
             await FirebaseFirestore.instance
-                .collection('expenses') // Firestore collection for expenses
-                .where('userId',
-                    isEqualTo: customer.id) // Link expenses to userId
+                .collection('expense')
+                .where('date',
+                    isGreaterThanOrEqualTo: Timestamp.fromDate(firstDayOfMonth))
+                .where('date',
+                    isLessThanOrEqualTo: Timestamp.fromDate(lastDayOfMonth))
+                .where('name',
+                    isEqualTo: customer.name) // Link expenses to userId
                 .get();
-
+        print(' Expenses data: ${expenseSnapshot.docs}');
         // Step 3: Sum the amounts of all expenses for this user
         for (var expenseDoc in expenseSnapshot.docs) {
+          // print('Expense amount: ${expenseDoc.data()['amount']}');
+          print('Expense amount: ');
           var expenseData = expenseDoc.data();
           Expense expense = Expense.fromMap(expenseDoc.id, expenseData);
 

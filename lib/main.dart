@@ -1,16 +1,9 @@
 import 'package:business/component/firebase/firebase_options.dart';
-import 'package:business/component/page/home.dart';
-
-// import 'package:business/component/page/home.dart';
 import 'package:business/component/utils/global.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'component/bottom_navigation.dart';
-import 'component/page/business/business_home.dart';
 import 'component/utils/side_bar.dart';
-// import 'component/bottom_navigation.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,14 +19,12 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Login',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Consumer<Global>(
+      builder: (context, global, child) => MaterialApp(
+        title: 'Flutter Login',
+        theme: global.getTheme(),
+        home: SideMenuPage(),
       ),
-      // home: const BusinessHome(),
-      home: SideMenuPage(),
-      // home: const BottomNavigation(),
     );
   }
 }

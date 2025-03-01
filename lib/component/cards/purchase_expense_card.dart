@@ -46,13 +46,13 @@ class PurchaseIncomeCard extends StatelessWidget {
             ),
             // Expense Card
             InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ExpenseCumulative()),
-                );
-              },
+              // onTap: () {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //         builder: (context) => const ExpenseCumulative()),
+              //   );
+              // },
               child: Card(
                 color: Colors.red[500],
                 child: SizedBox(

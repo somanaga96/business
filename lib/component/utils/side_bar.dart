@@ -78,7 +78,15 @@ class SideMenuPage extends StatelessWidget {
                         Icons.production_quantity_limits_sharp,
                         size: 40,
                       ),
-                    )
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        global.toggleTheme();
+                      },
+                      icon: Icon(global.isDarkMode
+                          ? Icons.dark_mode_rounded
+                          : Icons.wb_sunny),
+                    ),
                   ],
                 ),
               ),
