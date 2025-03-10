@@ -1,3 +1,4 @@
+import 'package:business/component/egg/egg_screen.dart';
 import 'package:business/component/page/business/business_home.dart';
 import 'package:business/component/page/expense/expense_home.dart';
 import 'package:business/component/page/settings/Settings.dart';
@@ -17,7 +18,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   void initState() {
     super.initState();
-    screen = [BusinessHome(), ExpenseHome(), Egg()];
+    screen = [BusinessHome(), ExpenseHome(), EggScreen()];
   }
 
   @override

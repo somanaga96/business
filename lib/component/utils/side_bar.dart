@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../bottom_navigation.dart';
+import '../egg/egg_crud.dart';
 import '../page/home.dart';
 import '../page/products/product_page.dart';
 import 'global.dart';
@@ -52,6 +53,18 @@ class SideMenuPage extends StatelessWidget {
                           color: Colors.white,
                           fontSize: 24,
                         ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => EggCrud()),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.egg_outlined,
+                        size: 40,
                       ),
                     ),
                     IconButton(
