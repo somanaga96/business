@@ -18,7 +18,7 @@ class FormattedValueText extends StatelessWidget {
 
     return Text(
       '$quantity = $displayValue',
-      style: TextStyle(fontSize: 50),
+      style: TextStyle(fontSize: 40),
     );
   }
 }

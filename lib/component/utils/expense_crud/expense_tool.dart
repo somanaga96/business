@@ -118,7 +118,7 @@ class ExpenseTransactionsTool extends ChangeNotifier {
                               labelText: 'Amount', hintText: 'Enter amount'),
                         ),
                         PeriodInput(
-                          tenureType: currentSwitchValue ? "Credit" : "Debit",
+                          tenureType: currentSwitchValue ? "கொடுத்தது" : "வாங்கியது",
                           switchValue: currentSwitchValue,
                           onSwitchChanged: (value) {
                             modalSetState(() {

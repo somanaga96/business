@@ -39,15 +39,15 @@ class _BottomNavigationState extends State<BottomNavigation> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'வியாபாரம்',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calculate_outlined),
-            label: 'Calc',
+            label: 'செலவு',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.egg),
-            label: 'egg',
+            label: 'முட்டை',
           ),
         ],
       ),
